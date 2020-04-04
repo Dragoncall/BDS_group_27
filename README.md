@@ -44,7 +44,10 @@ that we can reason about them more easily in our code.
 This directory will include the processing steps we do within our API. Sentiment analysis, aggregation 
 and other processing steps will be defined here.
 
-Currently we have none.
+The current API uses Pipelines. Pipelines can be linked to eachother as to create one uniform flow
+of data. These pipelines are then collected in the pipeline zoo where developers can either create new pipelines
+or consume the most general pipelines. This will make it easy to return different kinds of data rapidly by
+containing the functionality of one step to as little as possible. 
 
 ## Resources
 In the resource folder, all static resources are summed up. This folder was added to include the prominent people
