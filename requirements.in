@@ -7,3 +7,4 @@ Werkzeug==1.0.1
 pip-tools
 tweepy
 python-dotenv
+markdown

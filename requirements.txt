@@ -11,6 +11,7 @@ flask==1.1.2              # via -r ./requirements.in
 idna==2.9                 # via requests
 itsdangerous==1.1.0       # via -r ./requirements.in, flask
 jinja2==2.11.1            # via -r ./requirements.in, flask
+markdown==3.2.1           # via -r ./requirements.in
 markupsafe==1.1.1         # via -r ./requirements.in, jinja2
 oauthlib==3.1.0           # via requests-oauthlib
 pip-tools==4.5.1          # via -r ./requirements.in
@@ -22,3 +23,6 @@ six==1.14.0               # via pip-tools, tweepy
 tweepy==3.8.0             # via -r ./requirements.in
 urllib3==1.25.8           # via requests
 werkzeug==1.0.1           # via -r ./requirements.in, flask
+
+# The following packages are considered to be unsafe in a requirements file:
+# setuptools
