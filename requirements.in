@@ -8,3 +8,4 @@ pip-tools
 tweepy
 python-dotenv
 markdown
+matplotlib

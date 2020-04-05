@@ -1,9 +1,9 @@
 from typing import Callable
 
-from processing.pipeline import InputPipelineStep, OutputPipelineStep
-from processing.preprocessing_step import PreprocessingPipeline
-from processing.sentiment_analysis import SentimentAnalysisPipeline
-from processing.statuses_to_json_pipeline import StatusesToJsonPipeline
+from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep
+from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeline
+from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
+from processing.core.statuses_to_json_pipeline import StatusesToJsonPipeline
 
 
 def get_sentiment_analysis_pipeline(callback: Callable):

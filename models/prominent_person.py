@@ -23,7 +23,7 @@ class ProminentUser(TwitterUser):
     def _create_handle_fetcher(self, handle):
         return FetchBuilder().set_query(f'@{handle}')
 
-    def compile_fetchers(self, with_tags=True, with_keywords=True, with_handle=True):
+    def compile_fetchers(self, with_tags=True, with_keywords=True, with_handle=True) -> List[FetchBuilder]:
         fetchers = []
         if with_tags:
             fetchers += [self._create_tag_fetcher(tag) for tag in self.associated_tags]

@@ -75,3 +75,13 @@ in an easy to change format (such as JSON). This will allow other people to more
 ## Visualisations
 This API is part of an analysis. All visualisation code is present under the `visualisation` directory and will
 probably include `matplotlib` plots, `D3` visualisations and other derivatives of this API.
+
+The preferred way to create such a visualisation is to go through 3 steps.
+
+- Create the data fetchers
+- Create the pipeline
+- Run the pipeline with the data retrieved from the fetchers
+
+To allow visualisations to be a `PipelineStep`, the `Visualiser` class has
+all methods a visualisation needs to extend. This will also allow a `Visualiser` to
+be ran during other pipelines (for example to visualise API usage)

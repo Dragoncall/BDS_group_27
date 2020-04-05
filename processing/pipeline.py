@@ -117,4 +117,4 @@ if __name__ == '__main__':
 
     input_step.continue_last_checkpoint()  # Uses the last stored checkpoint
     input_step.continue_last_checkpoint_for_hash(pickle.dumps('Well hello there!'))  # Uses the hash as checkpoint key
-    input_step.output.output.step('Well hello there!')  # Runs the last step directly using certain input 
+    input_step.output.output.step('Well hello there!')  # Runs the last step directly using certain input

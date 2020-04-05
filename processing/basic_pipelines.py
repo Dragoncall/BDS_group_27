@@ -1,5 +1,4 @@
 from typing import Callable, Optional, Any
-
 from processing.pipeline import PipelineStep, CheckpointedPipelineStep
 
 
