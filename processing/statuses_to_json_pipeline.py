@@ -1,6 +1,6 @@
-from processing.pipeline import PipelineStep
+from processing.pipeline import CheckpointedPipelineStep
 
 
-class StatusesToJsonPipeline(PipelineStep):
-    def do_work(self, tweets, *args, **kwargs):
+class StatusesToJsonPipeline(CheckpointedPipelineStep):
+    def _do_work(self, tweets, *args, **kwargs):
         return [tweet._json for tweet in tweets]

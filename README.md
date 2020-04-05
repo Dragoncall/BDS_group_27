@@ -49,6 +49,25 @@ of data. These pipelines are then collected in the pipeline zoo where developers
 or consume the most general pipelines. This will make it easy to return different kinds of data rapidly by
 containing the functionality of one step to as little as possible. 
 
+Some pipelines support checkpointing by setting the `checkpointed` flag to true during initialisation.
+What this does is caching all runs' results based on the input hash. 
+This will make it easy to debug certain steps that are based on expensive previous steps. The `pipelines.py` file contains an example.
+
+The true value of this checkpointing is in debugging speed. For example, the pipeline is something like this:
+Input -> Expensive step -> Failed step -> Output. Now we can transform the pipeline to debug the failed step as follows:
+Input -> Expensive step (checkpointed) -> Failed step -> Output. The expensive step will now not be calculated, but its result
+will come from the cache.
+
+Of course, its also possible that the exact input data cannot be reused. In this case, there are two possibilities.
+If the object still exists, the last computed input hash is still present on the object as `last_checkpoint`. 
+Then the `InputPipeline` object exposes a function `continue_last_checkpoint` that reuses the last computed data.
+If this is not possible, it's also possible to rerun the pipeline with a given input hash with the function 
+`continue_last_checkpoint_for_hash`. It is required that some checkpoint in the pipeline exists with the given hash,
+a `ValueError` is raised otherwise.
+
+To have a deterministic way of representing the input data, we use the `pickle.dumps(value)` function as
+this represents the input data (all kinds of input) in a binary way.
+
 ## Resources
 In the resource folder, all static resources are summed up. This folder was added to include the prominent people
 in an easy to change format (such as JSON). This will allow other people to more easily add their tags and keywords.

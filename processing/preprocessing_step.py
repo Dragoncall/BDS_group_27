@@ -1,6 +1,6 @@
-from processing.pipeline import PipelineStep
+from processing.pipeline import CheckpointedPipelineStep
 
 
-class PreprocessingPipeline(PipelineStep):
-    def do_work(self, input, *args, **kwargs):
+class PreprocessingPipeline(CheckpointedPipelineStep):
+    def _do_work(self, input, *args, **kwargs):
         return input  # TODO: implement this
