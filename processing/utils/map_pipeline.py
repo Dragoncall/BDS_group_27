@@ -4,6 +4,7 @@ from processing.pipeline import CheckpointedPipelineStep
 
 
 class MapPipeline(CheckpointedPipelineStep):
+    """Maps a list of input values using a predefined func"""
     def __init__(self, name, func:Callable, *args, **kwargs):
         super().__init__(name)
         self.func = func

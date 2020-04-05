@@ -18,6 +18,12 @@ class ProminentUser(TwitterUser):
 
     @staticmethod
     def from_resources(handle):
+        """
+        Searches the handle in the 'prominent_people.json' file and inits the class with
+        the added keywords and tags.
+        Raises a ValueError is the handle is not found in the resource.
+        """
+
         dir_path = os.path.dirname(os.path.realpath(__file__))
         with open(f'{dir_path}/../resources/prominent_people.json', 'r') as f:
             json_dict = json.load(f)
@@ -47,7 +53,3 @@ class ProminentUser(TwitterUser):
         if with_handle:
             fetchers += [self._create_handle_fetcher(self.handle)]
         return fetchers
-
-# TODO: we need to add some prominent people with their handles, their keywords and their tags here
-# Or find some way to automatically find these tags & keywords
-# The fallback plan should always to check for mentions using their handle

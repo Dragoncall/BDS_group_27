@@ -5,6 +5,13 @@ from processing.pipeline import CheckpointedPipelineStep
 
 
 class ProminentPersonCompilePipeline(CheckpointedPipelineStep):
+    """
+    Transforms a handle into a Prominent person and compiles its FetchBuilders.
+    Handles will first be searched for in the resources (prominent_people.json)
+    The kwargs of this compilation should not be passed as inputs, but as init values for
+    this pipeline step. They are thus fixed.
+    """
+
     def __init__(self, name, with_handle=False, with_tags=False, with_keywords=False, *args, **kwargs):
         super().__init__(name, *args, **kwargs)
         self.with_handle = with_handle
@@ -26,6 +33,11 @@ class ProminentPersonCompilePipeline(CheckpointedPipelineStep):
         )
 
 class ProminentPersonCompileOnArgsPipeline(CheckpointedPipelineStep):
+    """
+    Transforms a handle into a Prominent person and compiles its FetchBuilders.
+    Handles will first be searched for in the resources (prominent_people.json)
+    The kwargs of this compilation should also be passed as inputs
+    """
     def _do_work(self, input:Tuple[str, bool, bool, bool], *args, **kwargs):
         # Input is the handle of a person | with_handle | with_tags | with_keywords
         handle, with_handle, with_tags, with_keywords = input

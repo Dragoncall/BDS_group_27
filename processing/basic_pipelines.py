@@ -46,6 +46,10 @@ class InputPipelineStep(IdentityPipelineStep):
         self._run_step_for_key(last_checkpoint, last_checkpoint.last_checkpoint)
 
     def continue_last_checkpoint_for_hash(self, input_hash):
+        """
+        Continue the pipeline from the given input hash. Will start running from the last
+        pipeline that has stored this exact hash.
+        """
         current_step = self
         last_checkpoint = None
         while current_step.output is not None:
@@ -67,6 +71,7 @@ class OutputPipelineStep(CheckpointedPipelineStep):
         self.callback = callback
 
     def _do_work(self, input, *args, **kwargs):
+        """Do not do any work!"""
         return input
 
     def step(self, input, result=None):
@@ -75,6 +80,11 @@ class OutputPipelineStep(CheckpointedPipelineStep):
 
 
 class SplitPipelineStep(PipelineStep):
+    """
+    Class that takes an input and pushes it to 2 outputs. These are then ran after eachother,
+    but as two different pipelines.
+    """
+
     def do_work(self, input, *args, **kwargs):
         pass
 
@@ -95,6 +105,12 @@ class SplitPipelineStep(PipelineStep):
 
 
 class SpreadPipelineStep(PipelineStep):
+    """
+    Class that pushes each item in the received input to a standalone pipeline, starting with
+    the connected output PipelineStep. This makes it easy to do something for each item in a list,
+    while keeping the pipeline pattern intact and simple to reason about.
+    """
+
     def do_work(self, input, *args, **kwargs):
         pass
 
@@ -110,15 +126,22 @@ class SpreadPipelineStep(PipelineStep):
 
 
 class ConditionalPipelineStep(PipelineStep):
+    """
+    Class that runs a function with the input.
+    If true, take the output_true path.
+    If false, take the output_false path.
+    """
+
     def do_work(self, input, *args, **kwargs):
         pass
 
-    def __init__(self, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None,
+    def __init__(self, func:Callable, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None,
                  output_false: Optional['PipelineStep'] = None):
         super().__init__()
         self.input = input
         self.output_true = output_true
         self.output_false = output_false
+        self.func = func
 
     def link(self, output_true: 'PipelineStep', output_false: 'PipelineStep'):
         self.output_true = output_true
@@ -128,13 +151,14 @@ class ConditionalPipelineStep(PipelineStep):
         return output_true, output_false
 
     def step(self, input):
-        if input:
+        if self.func(input):
             self.output_true.step(input)
         else:
             self.output_false.step(input)
 
 
 class PrintPipelineStep(PipelineStep):
+    """Class that just prints the received value and pushes it to the next step untouched"""
     def do_work(self, input, *args, **kwargs):
         print(input)
         return input

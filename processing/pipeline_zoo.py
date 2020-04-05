@@ -7,10 +7,10 @@ from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeli
 from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
 from processing.utils.flatten_pipeline import FlattenPipeline
 from processing.utils.statuses_to_json_pipeline import StatusesToJsonPipeline
-from processing.utils.to_json_pipeline import ToJsonPipeline
 
 
 def get_sentiment_analysis_pipeline(callback: Callable):
+    """Gets the pipeline that is used for untargeted sentiment analysis"""
     input_step = InputPipelineStep()
     input_step \
         .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
@@ -23,6 +23,7 @@ def get_sentiment_analysis_pipeline(callback: Callable):
 
 
 def get_json_from_tweets(callback: Callable):
+    """Gets the pipeline that is used for untargeted raw data retrieval"""
     input_step = InputPipelineStep()  # Input is the query params
     input_step \
         .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
