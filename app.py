@@ -38,8 +38,8 @@ def get_raw_data():
 @app.route('/sentiment-data')
 def get_pipelined_data():
     """
-    Fetches the raw twitter data based on the query params alone.
-    Does nothing with this, just returns it to the user.
+    Fetches the twitter data based on the query params alone.
+    Does sentiment analysis on the tweets and returns the calculated value to the user
     This can be used for debugging purposes or analysis, to see on which tweets results were based.
     Example request: /raw-data?query=kek&count=1
     """
@@ -50,8 +50,10 @@ def get_pipelined_data():
         nonlocal result  # This is ugly, ew, gotta fix this
         result = x
 
-    pipeline_zoo.get_temporary_sentiment_analysis_pipeline(set_result).feed_data((params, None))
-    return jsonify(result)
+    pipeline_zoo.get_sentiment_analysis_pipeline(set_result).feed_data((params, None))
+    return jsonify({
+        'sentiment_score': result
+    })
 
 @app.route('/')
 def index():

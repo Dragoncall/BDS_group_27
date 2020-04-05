@@ -7,27 +7,18 @@ from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeli
 from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
 from processing.utils.flatten_pipeline import FlattenPipeline
 from processing.utils.statuses_to_json_pipeline import StatusesToJsonPipeline
+from processing.utils.to_json_pipeline import ToJsonPipeline
 
 
 def get_sentiment_analysis_pipeline(callback: Callable):
     input_step = InputPipelineStep()
     input_step \
-        .link(PreprocessingPipeline('preprocess')) \
-        .link(SentimentAnalysisPipeline('sentiment')) \
-        .link(OutputPipelineStep('output', callback))
-    return input_step
-
-
-def get_temporary_sentiment_analysis_pipeline(callback: Callable):
-    input_step = InputPipelineStep()
-    input_step \
-        .link(QueryParamsToFetchersPipeline('query_params_mapping')) \
-        .link(FetchersToStatuses('fetch_data')) \
+        .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
+        .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
         .link(FlattenPipeline('flatten_data')) \
-        .link(PreprocessingPipeline('preprocess')) \
-        .link(SentimentAnalysisPipeline('sentiment')) \
-        .link(StatusesToJsonPipeline('to_json')) \
-        .link(OutputPipelineStep('output', callback))
+        .link(PreprocessingPipeline('preprocess', checkpointed=True)) \
+        .link(SentimentAnalysisPipeline('sentiment', checkpointed=True)) \
+        .link(OutputPipelineStep('output_sentiment', callback))
     return input_step
 
 
@@ -36,7 +27,7 @@ def get_json_from_tweets(callback: Callable):
     input_step \
         .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
         .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
-        .link(FlattenPipeline('flatten_data', checkpointed=True)) \
-        .link(StatusesToJsonPipeline('to_json', checkpointed=True)) \
-        .link(OutputPipelineStep('output', callback, checkpointed=True))
+        .link(FlattenPipeline('flatten_data')) \
+        .link(StatusesToJsonPipeline('to_json')) \
+        .link(OutputPipelineStep('output_raw', callback, checkpointed=True))
     return input_step
