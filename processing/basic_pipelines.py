@@ -1,3 +1,4 @@
+from copy import copy
 from typing import Callable, Optional, Any, List
 
 from processing.pipeline import PipelineStep, CheckpointedPipelineStep
@@ -92,11 +93,28 @@ class SplitPipelineStep(PipelineStep):
         for output in self.outputs:
             output.step(input)
 
+
+class SpreadPipelineStep(PipelineStep):
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, inputs: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None):
+        super().__init__()
+        self.inputs = inputs
+        self.output = output
+        self._outputs = []
+
+    def step(self, inputs: List[Any]):
+        for input in inputs:
+            self.output.step(input)
+
+
 class ConditionalPipelineStep(PipelineStep):
     def do_work(self, input, *args, **kwargs):
         pass
 
-    def __init__(self, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None, output_false: Optional['PipelineStep'] = None):
+    def __init__(self, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None,
+                 output_false: Optional['PipelineStep'] = None):
         super().__init__()
         self.input = input
         self.output_true = output_true
@@ -114,3 +132,9 @@ class ConditionalPipelineStep(PipelineStep):
             self.output_true.step(input)
         else:
             self.output_false.step(input)
+
+
+class PrintPipelineStep(PipelineStep):
+    def do_work(self, input, *args, **kwargs):
+        print(input)
+        return input
