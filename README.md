@@ -20,10 +20,10 @@ The custom functions to fetch these resources are thus placed in this directory.
 Currently, there are a couple of files with classes and methods. 
 The most important class for the Tweepy bindings is the `FetchBuilder`. 
 This class uses the builder pattern to compile a `/search` request to Twitter's API. 
-Using this pattern, its easy to keep adding parameters in different methods until the entire query has been
+Using this pattern, its easy to keep adding parameters in different methods/PipelineSteps until the entire query has been
 planned out. After that, one can build the model creating a function that can be called with the api or 
 run it instantly with an api instance. It was chosen to do it this way, as for example, the Prominent Person model
-will augment the fetchers with their own information.
+will augment the fetchers with their own stored information.
 
 ## Models
 Currently the API builds on 2 models. These models are stored in the `models` directory.
@@ -78,10 +78,9 @@ probably include `matplotlib` plots, `D3` visualisations and other derivatives o
 
 The preferred way to create such a visualisation is to go through 3 steps.
 
-- Create the data fetchers
-- Create the pipeline
-- Run the pipeline with the data retrieved from the fetchers
+- Create the pipeline (preferably using the same name for shared steps with other pipelines)
+- Run the pipeline with the input
 
 To allow visualisations to be a `PipelineStep`, the `Visualiser` class has
 all methods a visualisation needs to extend. This will also allow a `Visualiser` to
-be ran during other pipelines (for example to visualise API usage)
+be ran during other pipelines (for example to visualise API usage or API latency?)
