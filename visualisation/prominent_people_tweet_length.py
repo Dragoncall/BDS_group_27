@@ -6,7 +6,7 @@ from tweepy import Status
 from data_gathering.statuses_fetch import FetchersToStatuses
 from models.prominent_person import ProminentUser
 from models.result_types import ResultType
-from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep
+from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SplitPipelineStep
 from processing.models.prominent_person_compile_pipeline import ProminentPersonCompilePipeline, \
     ProminentPersonCompileOnArgsPipeline
 from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeline

@@ -1,4 +1,5 @@
-from typing import Callable, Optional, Any
+from typing import Callable, Optional, Any, List
+
 from processing.pipeline import PipelineStep, CheckpointedPipelineStep
 
 
@@ -43,7 +44,6 @@ class InputPipelineStep(IdentityPipelineStep):
             raise ValueError('Cannot continue the last checkpoint when no runs have been done!')
         self._run_step_for_key(last_checkpoint, last_checkpoint.last_checkpoint)
 
-
     def continue_last_checkpoint_for_hash(self, input_hash):
         current_step = self
         last_checkpoint = None
@@ -54,7 +54,6 @@ class InputPipelineStep(IdentityPipelineStep):
         if last_checkpoint is None:
             raise ValueError(f'No checkpoint for key {input_hash}')
         self._run_step_for_key(last_checkpoint, input_hash)
-
 
 
 class OutputPipelineStep(CheckpointedPipelineStep):
@@ -73,3 +72,45 @@ class OutputPipelineStep(CheckpointedPipelineStep):
         """Final step in the pipeline. Calls a callback with the result"""
         self.callback(result or self.do_work(input))
 
+
+class SplitPipelineStep(PipelineStep):
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, input: Optional['PipelineStep'] = None, outputs: Optional[List['PipelineStep']] = None):
+        super().__init__()
+        self.input = input
+        self.outputs = outputs
+
+    def link(self, outputs: List['PipelineStep']):
+        self.outputs = outputs
+        for output in self.outputs:
+            output.input = self
+        return self.outputs
+
+    def step(self, input):
+        for output in self.outputs:
+            output.step(input)
+
+class ConditionalPipelineStep(PipelineStep):
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None, output_false: Optional['PipelineStep'] = None):
+        super().__init__()
+        self.input = input
+        self.output_true = output_true
+        self.output_false = output_false
+
+    def link(self, output_true: 'PipelineStep', output_false: 'PipelineStep'):
+        self.output_true = output_true
+        self.output_false = output_false
+        for output in [output_true, output_false]:
+            output.input = self
+        return output_true, output_false
+
+    def step(self, input):
+        if input:
+            self.output_true.step(input)
+        else:
+            self.output_false.step(input)
