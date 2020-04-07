@@ -20,6 +20,7 @@ class FetchBuilder:
         self.until = None
         self.since_id = None
         self.max_id = None
+        self.tweet_mode = 'extended'
 
     def _set_attr(self, key, value):
         self.__setattr__(key, value)
@@ -48,6 +49,9 @@ class FetchBuilder:
 
     def set_max_id(self, val:int):
          return self._set_attr('max_id', val)
+
+    def set_tweet_mode(self, val:str):
+         return self._set_attr('tweet_mode', val)
 
     def compile_query_params(self):
         return self.__dict__
