@@ -1,4 +1,6 @@
-from typing import Callable, Optional, Any
+from copy import copy
+from typing import Callable, Optional, Any, List
+
 from processing.pipeline import PipelineStep, CheckpointedPipelineStep
 
 
@@ -43,8 +45,11 @@ class InputPipelineStep(IdentityPipelineStep):
             raise ValueError('Cannot continue the last checkpoint when no runs have been done!')
         self._run_step_for_key(last_checkpoint, last_checkpoint.last_checkpoint)
 
-
     def continue_last_checkpoint_for_hash(self, input_hash):
+        """
+        Continue the pipeline from the given input hash. Will start running from the last
+        pipeline that has stored this exact hash.
+        """
         current_step = self
         last_checkpoint = None
         while current_step.output is not None:
@@ -54,7 +59,6 @@ class InputPipelineStep(IdentityPipelineStep):
         if last_checkpoint is None:
             raise ValueError(f'No checkpoint for key {input_hash}')
         self._run_step_for_key(last_checkpoint, input_hash)
-
 
 
 class OutputPipelineStep(CheckpointedPipelineStep):
@@ -67,9 +71,94 @@ class OutputPipelineStep(CheckpointedPipelineStep):
         self.callback = callback
 
     def _do_work(self, input, *args, **kwargs):
+        """Do not do any work!"""
         return input
 
     def step(self, input, result=None):
         """Final step in the pipeline. Calls a callback with the result"""
         self.callback(result or self.do_work(input))
 
+
+class SplitPipelineStep(PipelineStep):
+    """
+    Class that takes an input and pushes it to 2 outputs. These are then ran after eachother,
+    but as two different pipelines.
+    """
+
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, input: Optional['PipelineStep'] = None, outputs: Optional[List['PipelineStep']] = None):
+        super().__init__()
+        self.input = input
+        self.outputs = outputs
+
+    def link(self, outputs: List['PipelineStep']):
+        self.outputs = outputs
+        for output in self.outputs:
+            output.input = self
+        return self.outputs
+
+    def step(self, input):
+        for output in self.outputs:
+            output.step(input)
+
+
+class SpreadPipelineStep(PipelineStep):
+    """
+    Class that pushes each item in the received input to a standalone pipeline, starting with
+    the connected output PipelineStep. This makes it easy to do something for each item in a list,
+    while keeping the pipeline pattern intact and simple to reason about.
+    """
+
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, inputs: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None):
+        super().__init__()
+        self.inputs = inputs
+        self.output = output
+        self._outputs = []
+
+    def step(self, inputs: List[Any]):
+        for input in inputs:
+            self.output.step(input)
+
+
+class ConditionalPipelineStep(PipelineStep):
+    """
+    Class that runs a function with the input.
+    If true, take the output_true path.
+    If false, take the output_false path.
+    """
+
+    def do_work(self, input, *args, **kwargs):
+        pass
+
+    def __init__(self, func:Callable, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None,
+                 output_false: Optional['PipelineStep'] = None):
+        super().__init__()
+        self.input = input
+        self.output_true = output_true
+        self.output_false = output_false
+        self.func = func
+
+    def link(self, output_true: 'PipelineStep', output_false: 'PipelineStep'):
+        self.output_true = output_true
+        self.output_false = output_false
+        for output in [output_true, output_false]:
+            output.input = self
+        return output_true, output_false
+
+    def step(self, input):
+        if self.func(input):
+            self.output_true.step(input)
+        else:
+            self.output_false.step(input)
+
+
+class PrintPipelineStep(PipelineStep):
+    """Class that just prints the received value and pushes it to the next step untouched"""
+    def do_work(self, input, *args, **kwargs):
+        print(input)
+        return input

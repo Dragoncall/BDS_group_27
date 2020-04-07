@@ -1,28 +1,35 @@
 from collections import defaultdict
-from typing import List
+from typing import List, Union
 
 from tweepy import Status
 
+from data_gathering.statuses_fetch import FetchersToStatuses
 from models.prominent_person import ProminentUser
 from models.result_types import ResultType
-from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep
+from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SplitPipelineStep, SpreadPipelineStep, \
+    PrintPipelineStep
+from processing.models.prominent_person_compile_pipeline import ProminentPersonCompilePipeline, \
+    ProminentPersonCompileOnArgsPipeline
 from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeline
 from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
+from processing.utils.fetcher_augmenter import FetcherAugmenter
+from processing.utils.flatten_pipeline import FlattenPipeline
 from settings import get_tweepy_client
 from visualisation.pipelines.visualiser import Visualiser
 import matplotlib.pyplot as plt
 
+from visualisation.prominent_people_visualisations.pipelines import default_prominent_people_pipeline, \
+    run_prominent_people_pipeline
+
 
 class ProminentPeopleVisualiser(Visualiser):
     # This example plots the word count per tweet
-    def visualise(self, tweets:'List[Status]'):
+    def visualise(self, tweets: 'List[Status]'):
         text_list = []
         for tweet in tweets:
             if hasattr(tweet, 'full_text'):
-                print(tweet.full_text)
                 text_list.append(tweet.full_text)
             else:
-                print(tweet.text)
                 text_list.append(tweet.text)
 
         binned_wordcounts = defaultdict(list)
@@ -35,31 +42,20 @@ class ProminentPeopleVisualiser(Visualiser):
         plt.show()
 
 
-def get_pipeline():
+def get_tweet_length_pipeline():
     # Combine Pipelines to get the required result
-
-    input_step = InputPipelineStep()
+    input_step = default_prominent_people_pipeline()
     input_step \
+        .link(FetcherAugmenter('augment_fetchers_count_result_type', {'count': 100, 'result_type': ResultType.POPULAR})) \
+        .link(FetchersToStatuses('fetch_data')) \
+        .link(FlattenPipeline('flatten_data')) \
         .link(ProminentPeopleVisualiser()) \
-        .link(OutputPipelineStep('output', lambda x: print('Done')))
+        .link(OutputPipelineStep('output', lambda x: print(f'length: {len(x)}')))
     return input_step
 
 
-def prominent_people_sentiment(prominent_person: 'ProminentUser', with_tags=True, with_keywords=True, with_handle=True):
-    # 1) Setup the data gathering
-    # 2) Get the pipeline
-    # 3) Run with the retrieved data
-
-    fetchers = prominent_person.compile_fetchers(with_tags, with_keywords, with_handle)
-    for fetcher in fetchers:
-        fetcher.set_count(100) # Use the maximum of samples
-        fetcher.set_result_type(ResultType.POPULAR) # Only use the most popular tweets
-    api = get_tweepy_client()
-    results = [fetcher.run(api) for fetcher in fetchers]
-    all_tweets = [tweet for result in results for tweet in result]
-    get_pipeline().feed_data(all_tweets)
-
 if __name__ == '__main__':
-    prominent_people_sentiment(
-        ProminentUser('POTUS', associated_tags=[], associated_keywords=[], api=None),
+    run_prominent_people_pipeline(
+        get_tweet_length_pipeline(),
+        ['POTUS', 'Sophie_Wilmes', 'EmmanuelMacron']
     )

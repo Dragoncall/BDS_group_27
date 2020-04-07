@@ -1,4 +1,6 @@
-from typing import List, Dict, Optional
+import json
+import os
+from typing import List, Optional
 
 import tweepy
 
@@ -13,6 +15,25 @@ class ProminentUser(TwitterUser):
         super().__init__(handle, api)
         self.associated_tags = associated_tags
         self.associated_keywords = associated_keywords
+
+    @staticmethod
+    def from_resources(handle):
+        """
+        Searches the handle in the 'prominent_people.json' file and inits the class with
+        the added keywords and tags.
+        Raises a ValueError is the handle is not found in the resource.
+        """
+
+        dir_path = os.path.dirname(os.path.realpath(__file__))
+        with open(f'{dir_path}/../resources/prominent_people.json', 'r') as f:
+            json_dict = json.load(f)
+            person = json_dict[handle]
+            return ProminentUser(
+                handle, api=None,
+                associated_tags=person['associated_tags'],
+                associated_keywords=person['associated_keywords']
+            )
+
 
     def _create_tag_fetcher(self, tag):
         return FetchBuilder().set_query(tag)
@@ -32,7 +53,3 @@ class ProminentUser(TwitterUser):
         if with_handle:
             fetchers += [self._create_handle_fetcher(self.handle)]
         return fetchers
-
-# TODO: we need to add some prominent people with their handles, their keywords and their tags here
-# Or find some way to automatically find these tags & keywords
-# The fallback plan should always to check for mentions using their handle

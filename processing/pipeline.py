@@ -15,12 +15,18 @@ class PipelineStep:
         self.output = output
 
     def do_work(self, input, *args, **kwargs):
+        """Does some operations. This will be different for each pipeline"""
         raise NotImplementedError
 
     def step(self, input):
+        """Do some work and push the result to the input of the next step"""
         self.output.step(self.do_work(input))
 
     def link(self, output: 'PipelineStep'):
+        """
+        Link an output to this. Then return that output step to allow for a chain
+        of link operations.
+        """
         self.output = output
         output.input = self
         return self.output

@@ -1,0 +1,38 @@
+{
+  "POTUS": {
+    "associated_keywords": ["president of the united states", "@realDonaldTrump", "@WhiteHouse", "Donald Trump"],
+    "associated_tags": ["#POTUS", "#Trump"]
+  },
+  "Sophie_Wilmes": {
+    "associated_keywords": ["Sophie Wilmès", "Wilmes", "Wilmès"],
+    "associated_tags": []
+  },
+  "EmmanuelMacron": {
+    "associated_keywords": ["EmmanuelMacron", "Emmanuel Macron"],
+    "associated_tags": []
+  },
+  "sanchezcastejon": {
+    "associated_keywords": ["SANCHEZ", "Pedro Sánchez", "Sánchez", "Pedro", "Pedro Sanchez"],
+    "associated_tags": []
+  },
+  "JustinTrudeau": {
+    "associated_keywords": ["Justin Trudeau", "Trudeau"],
+    "associated_tags": ["#JustinTrudeau"]
+  },
+  "BorisJohnson":{
+    "associated_keywords": ["Boris Johnson"],
+    "associated_tags": ["#BorisJohnson"]
+  },
+  "BillGates": {
+    "associated_keywords": [],
+    "associated_tags": []
+  },
+  "vanranstmarc": {
+    "associated_keywords": [],
+    "associated_tags": []
+  },
+  "VanGuchtSteven": {
+    "associated_keywords": [],
+    "associated_tags": []
+  }
+}
