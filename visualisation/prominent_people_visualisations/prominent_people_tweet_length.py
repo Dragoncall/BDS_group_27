@@ -1,23 +1,15 @@
 from collections import defaultdict
-from typing import List, Union
+from typing import List
 
+import matplotlib.pyplot as plt
 from tweepy import Status
 
 from data_gathering.statuses_fetch import FetchersToStatuses
-from models.prominent_person import ProminentUser
 from models.result_types import ResultType
-from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SplitPipelineStep, SpreadPipelineStep, \
-    PrintPipelineStep
-from processing.models.prominent_person_compile_pipeline import ProminentPersonCompilePipeline, \
-    ProminentPersonCompileOnArgsPipeline
-from processing.sentiment_analysis.preprocessing_step import PreprocessingPipeline
-from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
+from processing.basic_pipelines import OutputPipelineStep
 from processing.utils.fetcher_augmenter import FetcherAugmenter
 from processing.utils.flatten_pipeline import FlattenPipeline
-from settings import get_tweepy_client
 from visualisation.pipelines.visualiser import Visualiser
-import matplotlib.pyplot as plt
-
 from visualisation.prominent_people_visualisations.pipelines import default_prominent_people_pipeline, \
     run_prominent_people_pipeline
 

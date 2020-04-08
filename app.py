@@ -36,12 +36,11 @@ def get_raw_data():
 
 
 @app.route('/sentiment-data')
-def get_pipelined_data():
+def get_sentiment_data():
     """
     Fetches the twitter data based on the query params alone.
     Does sentiment analysis on the tweets and returns the calculated value to the user
-    This can be used for debugging purposes or analysis, to see on which tweets results were based.
-    Example request: /raw-data?query=kek&count=1
+    Example request: /sentiment-data?query=kek&count=1
     """
     params = request.args
     result = None
@@ -53,6 +52,46 @@ def get_pipelined_data():
     pipeline_zoo.get_sentiment_analysis_pipeline(set_result).feed_data((params, None))
     return jsonify({
         'sentiment_score': result
+    })
+
+
+@app.route('/sentiment-distribution')
+def get_sentiment_distribution():
+    """
+    Fetches the twitter data based on the query params alone.
+    Does sentiment analysis on the tweets and returns the sentiment distribution to the user
+    Example request: /sentiment-data?query=kek&count=1
+    """
+    params = request.args
+    result = None
+
+    def set_result(x):
+        nonlocal result  # This is ugly, ew, gotta fix this
+        result = x
+
+    pipeline_zoo.get_sentiment_analysis_distribution_pipeline(set_result).feed_data((params, None))
+    return jsonify({
+        'sentiment_distribution': result
+    })
+
+@app.route('/most-prevalent-sentiment')
+def get_most_prevalent_sentiment():
+    """
+    Fetches the twitter data based on the query params alone.
+    Does sentiment analysis on the tweets and returns the most prevalent sentiment to the user along with the amount
+    of such sentiment observations
+    Example request: /most-prevalent-sentiment?query=kek&count=1
+    """
+    params = request.args
+    result = None
+
+    def set_result(x):
+        nonlocal result  # This is ugly, ew, gotta fix this
+        result = x
+
+    pipeline_zoo.get_sentiment_analysis_most_prevalent_pipeline(set_result).feed_data((params, None))
+    return jsonify({
+        'sentiment_distribution': result
     })
 
 @app.route('/')

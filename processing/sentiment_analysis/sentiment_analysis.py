@@ -1,20 +1,17 @@
-import random
-import pickle
 import os
-import tensorflow as tf
+import pickle
 
-from tensorflow import keras
-from keras.preprocessing.text import Tokenizer
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import load_model
-from keras.utils import CustomObjectScope
+import tensorflow as tf
 from keras.initializers import glorot_uniform
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import CustomObjectScope
 
 from processing.pipeline import CheckpointedPipelineStep
 
 
 class SentimentAnalysisPipeline(CheckpointedPipelineStep):
-    def _do_work(self, input, *args, **kwargs):
+    def __init__(self, name, *args, **kwargs):
+        super().__init__(name, *args, **kwargs)
 
         dir_path = os.path.dirname(os.path.realpath(__file__))
 
@@ -22,17 +19,20 @@ class SentimentAnalysisPipeline(CheckpointedPipelineStep):
         # colab version : 2.3.0-tf
         modelpath = dir_path + '/../../resources/lstm_model.h5'
         with CustomObjectScope({'GlorotUniform': glorot_uniform()}):
-            model = tf.keras.models.load_model(modelpath)
+            self.model = tf.keras.models.load_model(modelpath)
 
         # load tokenizer fitted on traning data
         with open(f'{dir_path}/../../resources/tokenizer.pickle', 'rb') as handle:
-            tokenizer = pickle.load(handle)
+            self.tokenizer = pickle.load(handle)
 
+
+    def _do_work(self, input, *args, **kwargs):
         max_length = 29
 
-        X = tokenizer.texts_to_sequences([input])
+        X = self.tokenizer.texts_to_sequences([input])
         X = pad_sequences(X, maxlen=max_length)
 
-        predictions = model.predict_classes(X)
+        predictions = self.model.predict_classes(X)
+        probabilities = self.model.predict_proba(X)
 
-        return predictions
+        return int(predictions[0]), [float(x) for x in probabilities[0].tolist()]
