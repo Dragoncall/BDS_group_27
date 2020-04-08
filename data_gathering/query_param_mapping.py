@@ -11,7 +11,8 @@ query_param_map = {
     'count': lambda x, builder: builder.set_count(int(x)),
     'until': lambda x, builder: builder.set_until(x),
     'since_id': lambda x, builder: builder.set_since_id(int(x)),
-    'max_id': lambda x, builder: builder.set_max_id(int(x))
+    'max_id': lambda x, builder: builder.set_max_id(int(x)),
+    'filter_retweets': lambda x, builder: builder.set_filter_retweets(x)
 }
 
 

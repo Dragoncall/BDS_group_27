@@ -21,6 +21,7 @@ class FetchBuilder:
         self.since_id = None
         self.max_id = None
         self.tweet_mode = 'extended'
+        self.filter_retweets = None
 
     def _set_attr(self, key, value):
         self.__setattr__(key, value)
@@ -53,9 +54,18 @@ class FetchBuilder:
     def set_tweet_mode(self, val:str):
          return self._set_attr('tweet_mode', val)
 
+    def set_filter_retweets(self, val:str):
+         return self._set_attr('filter_retweets', val)
+
     def compile_query_params(self):
         query_dict = self.__dict__
         query_dict.pop('count', None)
+
+        if query_dict['filter_retweets'] == 'True':
+             query_dict['q'] += '-filter:retweets'
+
+        query_dict.pop('filter_retweets', None)
+
         return query_dict
 
     def build(self):
