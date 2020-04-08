@@ -10,4 +10,4 @@ class MapPipeline(CheckpointedPipelineStep):
         self.func = func
 
     def _do_work(self, input:List[Any], *args, **kwargs):
-        return map(self.func, input)
+        return list(map(self.func, input))

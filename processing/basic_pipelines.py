@@ -1,4 +1,5 @@
-from copy import copy
+from multiprocessing.dummy import Pool as ThreadPool
+from multiprocessing import Pool as ProcessPool, cpu_count
 from typing import Callable, Optional, Any, List
 
 from processing.pipeline import PipelineStep, CheckpointedPipelineStep
@@ -19,9 +20,11 @@ class InputPipelineStep(IdentityPipelineStep):
 
     def __init__(self, output: Optional['PipelineStep'] = None):
         super().__init__(None, output)
+        self.concurrent_pipelines = 1
 
     def feed_data(self, data: Any):
         """Feed data into this pipeline"""
+        self.concurrent_pipelines = 1
         self.step(data)
 
     def _find_final_checkpoint_last_run(self):
@@ -76,6 +79,7 @@ class OutputPipelineStep(CheckpointedPipelineStep):
 
     def step(self, input, result=None):
         """Final step in the pipeline. Calls a callback with the result"""
+        self.concurrent_pipelines = self.input.concurrent_pipelines
         self.callback(result or self.do_work(input))
 
 
@@ -100,6 +104,7 @@ class SplitPipelineStep(PipelineStep):
         return self.outputs
 
     def step(self, input):
+        self.concurrent_pipelines = self.input.concurrent_pipelines * len(self.outputs)
         for output in self.outputs:
             output.step(input)
 
@@ -114,15 +119,32 @@ class SpreadPipelineStep(PipelineStep):
     def do_work(self, input, *args, **kwargs):
         pass
 
-    def __init__(self, inputs: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None):
+    def __init__(self, inputs: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None,
+                 do_async=False, do_process_async=False):
         super().__init__()
         self.inputs = inputs
         self.output = output
         self._outputs = []
+        self.do_async = do_async
+        self.do_process_async = do_process_async
+
+        if self.do_process_async:
+            print('WARNING')
+            print('This is not optimised and might not work with your given pipeline')
+            print('Especially the MergePipelineStep is not compatible with this, nor any callback functions.')
+            print('Only use when data is written to somewhere else and no callbacks need to be called')
 
     def step(self, inputs: List[Any]):
-        for input in inputs:
-            self.output.step(input)
+        self.concurrent_pipelines = self.input.concurrent_pipelines * len(inputs)
+        if self.do_async:
+            with ThreadPool(8) as p:
+                p.map(self.output.step, inputs)
+        elif self.do_process_async:
+            with ProcessPool(cpu_count()) as p:
+                p.map(self.output.step, inputs)
+        else:
+            for input in inputs:
+                self.output.step(input)
 
 
 class ConditionalPipelineStep(PipelineStep):
@@ -135,7 +157,8 @@ class ConditionalPipelineStep(PipelineStep):
     def do_work(self, input, *args, **kwargs):
         pass
 
-    def __init__(self, func:Callable, input: Optional['PipelineStep'] = None, output_true: Optional['PipelineStep'] = None,
+    def __init__(self, func: Callable, input: Optional['PipelineStep'] = None,
+                 output_true: Optional['PipelineStep'] = None,
                  output_false: Optional['PipelineStep'] = None):
         super().__init__()
         self.input = input
@@ -151,6 +174,7 @@ class ConditionalPipelineStep(PipelineStep):
         return output_true, output_false
 
     def step(self, input):
+        self.concurrent_pipelines = self.input.concurrent_pipelines
         if self.func(input):
             self.output_true.step(input)
         else:
@@ -159,6 +183,50 @@ class ConditionalPipelineStep(PipelineStep):
 
 class PrintPipelineStep(PipelineStep):
     """Class that just prints the received value and pushes it to the next step untouched"""
+
     def do_work(self, input, *args, **kwargs):
         print(input)
         return input
+
+
+class MergePipelineStep(PipelineStep):
+    """
+    Pipeline that merges all inputs into one map with key the input pipeline and value
+    the retrieved value.
+    """
+
+    def __init__(self, input: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None):
+        super().__init__()
+        self.input = input
+        self.output = output
+        self.values = []
+        if input:
+            input.output = OutputPipelineStep(
+                f'merge_output', self.merge_value
+            )
+
+    def link(self, output: 'PipelineStep'):
+        self.input.output = OutputPipelineStep(
+            f'merge_output', lambda x: self.merge_value(x)
+        )
+        self.input.output.input = self.input
+        return super(MergePipelineStep, self).link(output)
+
+    def merge_value(self, value):
+        """Merges values into one list. Flushes when all of them have completed."""
+        self.values.append(value)
+        if len(self.values) == self.input.concurrent_pipelines:
+            self.concurrent_pipelines = 1
+            self.output.step(self.values)
+            self.values = {}
+
+
+if __name__ == '__main__':
+    # Merge test
+    input_step = InputPipelineStep()
+    input_step \
+        .link(SpreadPipelineStep()) \
+        .link(MergePipelineStep()) \
+        .link(OutputPipelineStep('kek', lambda x: print(x)))
+
+    input_step.feed_data(['kek', 'is', 'merged', 'to', 'one'])

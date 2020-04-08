@@ -13,6 +13,7 @@ class PipelineStep:
     def __init__(self, input: Optional['PipelineStep'] = None, output: Optional['PipelineStep'] = None):
         self.input = input
         self.output = output
+        self.concurrent_pipelines = 1
 
     def do_work(self, input, *args, **kwargs):
         """Does some operations. This will be different for each pipeline"""
@@ -20,6 +21,10 @@ class PipelineStep:
 
     def step(self, input):
         """Do some work and push the result to the input of the next step"""
+        if self.input:
+            self.concurrent_pipelines = self.input.concurrent_pipelines
+        else:
+            self.concurrent_pipelines = 1
         self.output.step(self.do_work(input))
 
     def link(self, output: 'PipelineStep'):
