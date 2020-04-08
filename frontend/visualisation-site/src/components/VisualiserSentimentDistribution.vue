@@ -36,8 +36,8 @@
       query: '',
       count: 20,
       until: '',
-      since_id: '',
-      max_id: '',
+      since_id: undefined,
+      max_id: undefined,
       data: undefined,
       primaryXAxis: {
         valueType: 'Category',
@@ -49,7 +49,7 @@
       async fetchData() {
         this.loading = true;
         const nonTransformedData = await axios.get(
-                `http://127.0.0.1:5000/sentiment-distribution?query=${this.query}&count=${this.count}&until=${this.until}&since_id=${this.since_id}&max_id=${this.max_id}`
+                `http://127.0.0.1:5000/sentiment-distribution?query=${this.query}&count=${this.count}&until=${this.until}${this.since_id ? '&since_id=' + this.since_id : ''}${this.max_id ? '&max_id=' + this.max_id : ''}`
         );
         const values = nonTransformedData.data.sentiment_distribution;
         const data = [];
