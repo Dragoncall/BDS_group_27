@@ -28,8 +28,10 @@ class SentimentAnalysisPipeline(CheckpointedPipelineStep):
         with open(f'{dir_path}/../../resources/tokenizer.pickle', 'rb') as handle:
             tokenizer = pickle.load(handle)
 
+        max_length = 29
+
         X = tokenizer.texts_to_sequences([input])
-        X = pad_sequences(X, maxlen=29)
+        X = pad_sequences(X, maxlen=max_length)
 
         predictions = model.predict_classes(X)
 

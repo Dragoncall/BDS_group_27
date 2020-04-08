@@ -5,7 +5,7 @@ from processing.pipeline import CheckpointedPipelineStep
 
 class PreprocessingPipeline(CheckpointedPipelineStep):
     def _do_work(self, input, *args, **kwargs):
-        # include all preprocessing steps below here ?
+        # include all preprocessing steps in here ?
         return input  # TODO: implement this
 
 class LowerCasePreprocessingPipeline(CheckpointedPipelineStep):
@@ -34,6 +34,20 @@ class RemovePunctuationPreprocessingPipeline(CheckpointedPipelineStep):
         punct = re.sub('\'', '', punct) # keep single quotes (in order to retain I'm, isn't, etc.)
 
         input = "".join([char for char in input if char not in punct])
+
+        return input
+
+class RemoveMentionsPreprocessingPipeline(CheckpointedPipelineStep):
+    def _do_work(self, input:str, *args, **kwargs):
+        mention_regex = r'@\S+'
+        input = re.sub(mention_regex, '', input)
+
+        return input
+
+class RemoveHashTagsPreprocessingPipeline(CheckpointedPipelineStep):
+    def _do_work(self, input:str, *args, **kwargs):
+        hashtag_regex = r'#\S+'
+        input = re.sub(hashtag_regex, '', input)
 
         return input
 
