@@ -16,7 +16,7 @@ class FetchBuilder:
         self.lang = None
         self.query = None
         self.result_type = None
-        self.count = None
+        self.count = 1
         self.until = None
         self.since_id = None
         self.max_id = None
@@ -54,13 +54,19 @@ class FetchBuilder:
          return self._set_attr('tweet_mode', val)
 
     def compile_query_params(self):
-        return self.__dict__
+        query_dict = self.__dict__
+        query_dict.pop('count', None)
+        return query_dict
 
     def build(self):
-        return lambda api: api.search(**self.compile_query_params())
+        count = self.count
+        return lambda api: tweepy.Cursor(api.search, **self.compile_query_params()).items(count)
 
     def run(self, api: tweepy.API):
-        return self.build()(api)
+        list_statuses = []
+        for status in self.build()(api):
+             list_statuses.append(status)
+        return list_statuses
 
 
 if __name__ == '__main__':
