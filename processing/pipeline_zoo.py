@@ -2,19 +2,17 @@ from typing import Callable
 
 from data_gathering.query_param_mapping import QueryParamsToFetchersPipeline
 from data_gathering.statuses_fetch import FetchersToStatuses
-from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SpreadPipelineStep, MergePipelineStep, \
-    SplitPipelineStep
+from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SpreadPipelineStep, MergePipelineStep
 from processing.post_processing.SentimentDistributionPipeline import SentimentDistributionPipeline
 from processing.sentiment_analysis.preprocessing_step import LowerCasePreprocessingPipeline, \
     RemoveNumberPreprocessingPipeline, \
-    RemoveUrlPreprocessingPipeline, RemovePunctuationPreprocessingPipeline, RemoveWhiteSpacePreprocessingPipeline, \
-    PreprocessingPipeline
+    RemoveUrlPreprocessingPipeline, RemovePunctuationPreprocessingPipeline, RemoveWhiteSpacePreprocessingPipeline
 from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
-from processing.utils.flatten_pipeline import FlattenPipeline
-from processing.utils.list_pipelines import CountPipeline, MaxPipeline, GetAtIndexPipeline
-from processing.utils.map_pipeline import MapPipeline
-from processing.utils.statuses_to_json_pipeline import StatusesToJsonPipeline
 from processing.utils.extract_tweet_from_json import ExtractTweetFromJson
+from processing.utils.flatten_pipeline import FlattenPipeline
+from processing.utils.list_pipelines import CountPipeline, GetAtIndexPipeline
+from processing.utils.map_pipeline import MapPipeline
+from processing.utils.to_json_pipeline import ToJsonPipeline
 
 
 def _sentiment_analysis_pipeline():
@@ -23,7 +21,7 @@ def _sentiment_analysis_pipeline():
         .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
         .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
         .link(FlattenPipeline('flatten_data')) \
-        .link(StatusesToJsonPipeline('to_json')) \
+        .link(MapPipeline('status_to_text', lambda x: x._json)) \
         .link(ExtractTweetFromJson('extract_tweet')) \
         .link(SpreadPipelineStep(do_async=True)) \
         .link(LowerCasePreprocessingPipeline('lower_data')) \
@@ -84,6 +82,7 @@ def get_json_from_tweets(callback: Callable):
         .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
         .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
         .link(FlattenPipeline('flatten_data')) \
-        .link(StatusesToJsonPipeline('to_json')) \
+        .link(MapPipeline('status_to_text', lambda x: x._json))\
+        .link(ToJsonPipeline('to_json')) \
         .link(OutputPipelineStep('output_raw', callback, checkpointed=True))
     return input_step

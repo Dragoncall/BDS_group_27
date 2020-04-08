@@ -92,10 +92,11 @@ class SplitPipelineStep(PipelineStep):
     def do_work(self, input, *args, **kwargs):
         pass
 
-    def __init__(self, input: Optional['PipelineStep'] = None, outputs: Optional[List['PipelineStep']] = None):
+    def __init__(self, input: Optional['PipelineStep'] = None, outputs: Optional[List['PipelineStep']] = None, is_async=False):
         super().__init__()
         self.input = input
         self.outputs = outputs
+        self.is_async = is_async
 
     def link(self, outputs: List['PipelineStep']):
         self.outputs = outputs
@@ -104,7 +105,7 @@ class SplitPipelineStep(PipelineStep):
         return self.outputs
 
     def step(self, input):
-        self.concurrent_pipelines = self.input.concurrent_pipelines * len(self.outputs)
+        self.concurrent_pipelines = self.input.concurrent_pipelines * (1 if not self.is_async else len(self.outputs))
         for output in self.outputs:
             output.step(input)
 

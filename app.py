@@ -4,6 +4,8 @@ Keep the logic in this file to a minimum to avoid cluttering!
 """
 
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
+
 import data_gathering
 import markdown
 import markdown.extensions.fenced_code
@@ -13,10 +15,14 @@ from data_gathering.sample_data_gathering import get_sample_data_gathering
 from processing import pipeline_zoo
 from settings import get_tweepy_client
 
+
 app = Flask(__name__)
+cors = CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 
 @app.route('/raw-data')
+@cross_origin()
 def get_raw_data():
     """
     Fetches the raw twitter data based on the query params alone.
@@ -36,6 +42,7 @@ def get_raw_data():
 
 
 @app.route('/sentiment-data')
+@cross_origin()
 def get_sentiment_data():
     """
     Fetches the twitter data based on the query params alone.
@@ -56,6 +63,7 @@ def get_sentiment_data():
 
 
 @app.route('/sentiment-distribution')
+@cross_origin()
 def get_sentiment_distribution():
     """
     Fetches the twitter data based on the query params alone.
@@ -75,6 +83,7 @@ def get_sentiment_distribution():
     })
 
 @app.route('/most-prevalent-sentiment')
+@cross_origin()
 def get_most_prevalent_sentiment():
     """
     Fetches the twitter data based on the query params alone.
