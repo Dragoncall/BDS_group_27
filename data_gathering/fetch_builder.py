@@ -16,10 +16,12 @@ class FetchBuilder:
         self.lang = None
         self.query = None
         self.result_type = None
-        self.count = None
+        self.count = 1
         self.until = None
         self.since_id = None
         self.max_id = None
+        self.tweet_mode = 'extended'
+        self.filter_retweets = None
 
     def _set_attr(self, key, value):
         self.__setattr__(key, value)
@@ -49,14 +51,32 @@ class FetchBuilder:
     def set_max_id(self, val:int):
          return self._set_attr('max_id', val)
 
+    def set_tweet_mode(self, val:str):
+         return self._set_attr('tweet_mode', val)
+
+    def set_filter_retweets(self, val:str):
+         return self._set_attr('filter_retweets', val)
+
     def compile_query_params(self):
-        return self.__dict__
+        query_dict = self.__dict__
+        query_dict.pop('count', None)
+
+        if query_dict['filter_retweets'] == 'True':
+             query_dict['q'] += '-filter:retweets'
+
+        query_dict.pop('filter_retweets', None)
+
+        return query_dict
 
     def build(self):
-        return lambda api: api.search(**self.compile_query_params())
+        count = self.count
+        return lambda api: tweepy.Cursor(api.search, **self.compile_query_params()).items(count)
 
     def run(self, api: tweepy.API):
-        return self.build()(api)
+        list_statuses = []
+        for status in self.build()(api):
+             list_statuses.append(status)
+        return list_statuses
 
 
 if __name__ == '__main__':
