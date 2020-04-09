@@ -11,3 +11,4 @@ tweepy
 python-dotenv
 markdown
 matplotlib
+flask-cors
