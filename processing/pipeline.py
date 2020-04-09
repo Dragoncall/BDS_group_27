@@ -1,4 +1,5 @@
 import pickle
+from collections import defaultdict
 from pathlib import Path
 from typing import Any, Optional, Callable
 
@@ -36,6 +37,7 @@ class PipelineStep:
         output.input = self
         return self.output
 
+value_map = defaultdict(dict)
 
 class CheckpointedPipelineStep(PipelineStep):
     """
@@ -51,11 +53,19 @@ class CheckpointedPipelineStep(PipelineStep):
         self.checkpointed = checkpointed
         self.name = name
 
-        self.checkpoint_dict = {}
+        # self.checkpoint_dict = {}
         if self.has_checkpoint_file():
             self.reload()
 
         self.last_checkpoint = None
+
+    @property
+    def checkpoint_dict(self):
+        return value_map[self.name]
+
+    @checkpoint_dict.setter
+    def checkpoint_dict(self, value):
+        value_map[self.name] = value
 
     @property
     def checkpoint_name(self):
