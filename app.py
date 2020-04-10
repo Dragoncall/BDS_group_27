@@ -97,9 +97,9 @@ def get_word_distribution():
         nonlocal result  # This is ugly, ew, gotta fix this
         result = x
 
-    pipeline_zoo.get_words_occurences(set_result).feed_data((params, None))
+    pipeline_zoo.get_word_distribution(set_result).feed_data((params, None))
     return jsonify({
-        'words_occurences': result
+        'word_distribution': result
     })
 
 @app.route('/most-prevalent-sentiment')
