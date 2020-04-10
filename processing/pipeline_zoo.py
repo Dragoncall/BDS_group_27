@@ -4,16 +4,17 @@ from data_gathering.query_param_mapping import QueryParamsToFetchersPipeline
 from data_gathering.statuses_fetch import FetchersToStatuses
 from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SpreadPipelineStep, MergePipelineStep
 from processing.post_processing.SentimentDistributionPipeline import SentimentDistributionPipeline
+from processing.post_processing.CountWordDistributionPipeline import CountWordDistributionPipeline, FilterWordDistributionPipeline
 from processing.sentiment_analysis.preprocessing_step import LowerCasePreprocessingPipeline, \
-    RemoveNumberPreprocessingPipeline, \
-    RemoveUrlPreprocessingPipeline, RemovePunctuationPreprocessingPipeline, RemoveWhiteSpacePreprocessingPipeline
+    RemoveNumberPreprocessingPipeline, RemoveMentionsPreprocessingPipeline, StemPreprocessingPipeline,\
+    RemoveUrlPreprocessingPipeline, RemovePunctuationPreprocessingPipeline, RemoveWhiteSpacePreprocessingPipeline,\
+    ConvertEmojisPreprocessingPipeline
 from processing.sentiment_analysis.sentiment_analysis import SentimentAnalysisPipeline
 from processing.utils.extract_tweet_from_json import ExtractTweetFromJson
 from processing.utils.flatten_pipeline import FlattenPipeline
 from processing.utils.list_pipelines import CountPipeline, GetAtIndexPipeline
 from processing.utils.map_pipeline import MapPipeline
 from processing.utils.to_json_pipeline import ToJsonPipeline
-
 
 def _sentiment_analysis_pipeline():
     input_step = InputPipelineStep()
@@ -27,6 +28,7 @@ def _sentiment_analysis_pipeline():
         .link(LowerCasePreprocessingPipeline('lower_data')) \
         .link(RemoveUrlPreprocessingPipeline('remove_url')) \
         .link(RemoveNumberPreprocessingPipeline('remove_n')) \
+        .link(ConvertEmojisPreprocessingPipeline('convert_emojis'))\
         .link(RemovePunctuationPreprocessingPipeline('remove_punct')) \
         .link(RemoveWhiteSpacePreprocessingPipeline('remove_space')) \
         .link(SentimentAnalysisPipeline('sentiment', checkpointed=True))
@@ -73,6 +75,30 @@ def get_sentiment_analysis_most_prevalent_pipeline(callback: Callable):
         .link(GetAtIndexPipeline(index=0)) \
         .link(OutputPipelineStep('output_most_prevalent_sentiment', callback))
     return input
+
+
+def get_word_distribution(callback: Callable):
+    '''Fetches, normalizes, cleans and counts words occurences'''
+    input_step = InputPipelineStep()
+    input_step \
+        .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
+        .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
+        .link(FlattenPipeline('flatten_data')) \
+        .link(MapPipeline('status_to_text', lambda x: x._json)) \
+        .link(ExtractTweetFromJson('extract_tweet'))\
+        .link(SpreadPipelineStep(do_async=True))\
+        .link(LowerCasePreprocessingPipeline('lower'))\
+        .link(RemoveUrlPreprocessingPipeline('remove_url'))\
+        .link(RemoveNumberPreprocessingPipeline('remove_n'))\
+        .link(ConvertEmojisPreprocessingPipeline('convert_emojis'))\
+        .link(RemovePunctuationPreprocessingPipeline('remove_punct'))\
+        .link(RemoveMentionsPreprocessingPipeline('remove_mention'))\
+        .link(StemPreprocessingPipeline('stem'))\
+        .link(MergePipelineStep())\
+        .link(CountWordDistributionPipeline('count_words', checkpointed=True))\
+        .link(FilterWordDistributionPipeline('filter_words'))\
+        .link(OutputPipelineStep('output_word_distribution', callback))
+    return input_step
 
 
 def get_json_from_tweets(callback: Callable):

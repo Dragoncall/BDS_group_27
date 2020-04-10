@@ -82,6 +82,26 @@ def get_sentiment_distribution():
         'sentiment_distribution': result
     })
 
+@app.route('/word-distribution')
+@cross_origin()
+def get_word_distribution():
+    """
+    Fetches the twitter data based on the query params alone.
+    Returns top most frequent words.
+    Example request: /word-distribution?query=kek&count=1
+    """
+    params = request.args
+    result = None
+
+    def set_result(x):
+        nonlocal result  # This is ugly, ew, gotta fix this
+        result = x
+
+    pipeline_zoo.get_words_occurences(set_result).feed_data((params, None))
+    return jsonify({
+        'words_occurences': result
+    })
+
 @app.route('/most-prevalent-sentiment')
 @cross_origin()
 def get_most_prevalent_sentiment():

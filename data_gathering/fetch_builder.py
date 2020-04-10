@@ -13,7 +13,7 @@ class FetchBuilder:
     """
     def __init__(self):
         self.geocode = None
-        self.lang = None
+        self.lang = 'en'
         self.query = None
         self.result_type = None
         self.count = 1

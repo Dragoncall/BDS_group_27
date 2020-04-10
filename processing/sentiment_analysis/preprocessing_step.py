@@ -1,5 +1,10 @@
 import re
 import string
+import nltk
+import emoji
+
+from nltk.stem.snowball import SnowballStemmer
+from tokenizer import tokenizer
 
 from processing.pipeline import CheckpointedPipelineStep
 
@@ -27,11 +32,14 @@ class RemoveNumberPreprocessingPipeline(CheckpointedPipelineStep):
 class RemovePunctuationPreprocessingPipeline(CheckpointedPipelineStep):
     def _do_work(self, input:str, *args, **kwargs):
         punct = string.punctuation
+        punct += '’'
+        punct += '“”'
+        punct += '«»'
 
         punct = re.sub(' ', '', punct)  # keep spaces
         punct = re.sub('#', '', punct)  # keep hashtags
         punct = re.sub('@', '', punct)  # keep mentions
-        punct = re.sub('\'', '', punct) # keep single quotes (in order to retain I'm, isn't, etc.)
+        #punct = re.sub('\'', '', punct) # keep single quotes (in order to retain I'm, isn't, etc.)
 
         input = "".join([char for char in input if char not in punct])
 
@@ -57,3 +65,20 @@ class RemoveWhiteSpacePreprocessingPipeline(CheckpointedPipelineStep):
         input = re.sub(space_regex, ' ', input)
         input = input.strip()
         return input
+
+class ConvertEmojisPreprocessingPipeline(CheckpointedPipelineStep):
+    def _do_work(self, input:str, *args, **kwargs):
+        return emoji.demojize(input)
+
+class StemPreprocessingPipeline(CheckpointedPipelineStep):
+    def _do_work(self, input, *args, **kwargs):
+        T = tokenizer.TweetTokenizer(regularize=True)
+        input = T.tokenize(input)
+        stemmer = SnowballStemmer("english")
+        
+        tweet = ''
+        for word in input:
+            word = stemmer.stem(word)
+            tweet += word+' '
+
+        return tweet
