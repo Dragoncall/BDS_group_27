@@ -4,22 +4,21 @@
       <h3>BDS Group 27</h3>
     </v-app-bar>
     <v-content>
-      <v-container>
-        <VisualiserSentimentDistribution/>
-      </v-container>
+      <VisualiserWordDistribution/>
     </v-content>
   </v-app>
 </template>
 
 <script>
 
-import VisualiserSentimentDistribution from "./components/VisualiserSentimentDistribution";
+// import VisualiserSentimentDistribution from "./components/VisualiserSentimentDistribution";
+import VisualiserWordDistribution from "./components/VisualiserWordDistribution";
 
 export default {
   name: 'App',
 
   components: {
-    VisualiserSentimentDistribution
+    VisualiserWordDistribution
   },
 
   data: () => ({
