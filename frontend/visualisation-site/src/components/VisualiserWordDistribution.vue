@@ -47,7 +47,7 @@
       async fetchData() {
         this.loading = true;
         const nonTransformedData = await axios.get(
-                `http://127.0.0.1:5000/word-distribution?query=${this.query}&filter_retweets=${this.filter_rt}&count=${this.count}&until=${this.until}${this.since_id ? '&since_id=' + this.since_id : ''}${this.max_id ? '&max_id=' + this.max_id : ''}`
+          `http://127.0.0.1:5000/word-distribution?query=${this.query}&filter_retweets=${this.filter_rt}&count=${this.count}&until=${this.until}${this.since_id ? '&since_id=' + this.since_id : ''}${this.max_id ? '&max_id=' + this.max_id : ''}`
         );
         const values = nonTransformedData.data.word_distribution;
         const data = [];

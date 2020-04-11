@@ -4,7 +4,7 @@
       <h3>BDS Group 27</h3>
     </v-app-bar>
     <v-content>
-      <VisualiserWordDistribution/>
+      <VisualiserWordCloud/>
     </v-content>
   </v-app>
 </template>
@@ -12,13 +12,14 @@
 <script>
 
 // import VisualiserSentimentDistribution from "./components/VisualiserSentimentDistribution";
-import VisualiserWordDistribution from "./components/VisualiserWordDistribution";
+// import VisualiserWordDistribution from "./components/VisualiserWordDistribution";
+import VisualiserWordCloud from "./components/VisualiserWordCloud";
 
 export default {
   name: 'App',
 
   components: {
-    VisualiserWordDistribution
+    VisualiserWordCloud
   },
 
   data: () => ({
