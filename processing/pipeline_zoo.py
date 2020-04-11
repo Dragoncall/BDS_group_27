@@ -4,7 +4,7 @@ from data_gathering.query_param_mapping import QueryParamsToFetchersPipeline
 from data_gathering.statuses_fetch import FetchersToStatuses
 from processing.basic_pipelines import InputPipelineStep, OutputPipelineStep, SpreadPipelineStep, MergePipelineStep
 from processing.post_processing.SentimentDistributionPipeline import SentimentDistributionPipeline
-from processing.post_processing.CountWordDistributionPipeline import CountWordDistributionPipeline, FilterWordDistributionPipeline
+from processing.post_processing.CountWordDistributionPipeline import CountWordDistributionPipeline, FilterWordDistributionPipeline, ReduceWordDistributionPipeline
 from processing.sentiment_analysis.preprocessing_step import LowerCasePreprocessingPipeline, \
     RemoveNumberPreprocessingPipeline, RemoveMentionsPreprocessingPipeline, StemPreprocessingPipeline,\
     RemoveUrlPreprocessingPipeline, RemovePunctuationPreprocessingPipeline, RemoveWhiteSpacePreprocessingPipeline,\
@@ -32,6 +32,28 @@ def _sentiment_analysis_pipeline():
         .link(RemovePunctuationPreprocessingPipeline('remove_punct')) \
         .link(RemoveWhiteSpacePreprocessingPipeline('remove_space')) \
         .link(SentimentAnalysisPipeline('sentiment', checkpointed=True))
+    return input_step, output
+
+def _word_distribution_pipeline():
+    '''Fetches, normalizes, cleans and counts words occurences'''
+    input_step = InputPipelineStep()
+    output = input_step \
+        .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
+        .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
+        .link(FlattenPipeline('flatten_data')) \
+        .link(MapPipeline('status_to_text', lambda x: x._json)) \
+        .link(ExtractTweetFromJson('extract_tweet'))\
+        .link(SpreadPipelineStep(do_async=True))\
+        .link(LowerCasePreprocessingPipeline('lower'))\
+        .link(RemoveUrlPreprocessingPipeline('remove_url'))\
+        .link(RemoveNumberPreprocessingPipeline('remove_n'))\
+        .link(ConvertEmojisPreprocessingPipeline('convert_emojis'))\
+        .link(RemovePunctuationPreprocessingPipeline('remove_punct'))\
+        .link(RemoveMentionsPreprocessingPipeline('remove_mention'))\
+        .link(StemPreprocessingPipeline('stem'))\
+        .link(MergePipelineStep())\
+        .link(CountWordDistributionPipeline('count_words', checkpointed=True))\
+        .link(FilterWordDistributionPipeline('filter_words'))
     return input_step, output
 
 
@@ -78,27 +100,21 @@ def get_sentiment_analysis_most_prevalent_pipeline(callback: Callable):
 
 
 def get_word_distribution(callback: Callable):
-    '''Fetches, normalizes, cleans and counts words occurences'''
-    input_step = InputPipelineStep()
-    input_step \
-        .link(QueryParamsToFetchersPipeline('query_params_mapping', checkpointed=True)) \
-        .link(FetchersToStatuses('fetch_data', checkpointed=True)) \
-        .link(FlattenPipeline('flatten_data')) \
-        .link(MapPipeline('status_to_text', lambda x: x._json)) \
-        .link(ExtractTweetFromJson('extract_tweet'))\
-        .link(SpreadPipelineStep(do_async=True))\
-        .link(LowerCasePreprocessingPipeline('lower'))\
-        .link(RemoveUrlPreprocessingPipeline('remove_url'))\
-        .link(RemoveNumberPreprocessingPipeline('remove_n'))\
-        .link(ConvertEmojisPreprocessingPipeline('convert_emojis'))\
-        .link(RemovePunctuationPreprocessingPipeline('remove_punct'))\
-        .link(RemoveMentionsPreprocessingPipeline('remove_mention'))\
-        .link(StemPreprocessingPipeline('stem'))\
-        .link(MergePipelineStep())\
-        .link(CountWordDistributionPipeline('count_words', checkpointed=True))\
-        .link(FilterWordDistributionPipeline('filter_words'))\
+    """Gets the pipeline that is used for barplot word distribution (top most frequent words)"""
+    input, output = _word_distribution_pipeline()
+
+    output\
+        .link(ReduceWordDistributionPipeline('reduce_word_distribution'))\
         .link(OutputPipelineStep('output_word_distribution', callback))
-    return input_step
+    return input
+
+def get_full_word_distribution(callback: Callable):
+    """Gets the pipeline that is used for wordcloud (all words)"""
+    input, output = _word_distribution_pipeline()
+
+    output\
+        .link(OutputPipelineStep('output_full_word_distribution', callback))
+    return input
 
 
 def get_json_from_tweets(callback: Callable):

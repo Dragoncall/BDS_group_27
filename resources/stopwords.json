@@ -2,13 +2,13 @@
     "generic":{
         "associated_stopwords" : ["think", "people", "either", "dont", "would", "want",  "say",
           "one", "via", "get", "go", "know", "amp", "cant", "didnt", "take", "thing", "de", "el",
-           "la", "que", "even", "enough", "doesnt", "tweet", "make"]
+           "la", "que", "even", "enough", "doesnt", "tweet", "make", "also", "said", "etc"]
     },
     "trump": {
       "associated_stopwords": ["donald", "trump", "president", "united", "states", "donald", "american",
          "america", "usa", "us"]
     },
-    "johnson": {
-      "associated_stopwords": ["boris", "johnson", "england", "english", "uk", "prime", "minister"]
+    "bori": {
+      "associated_stopwords": ["boris", "johnson", "england", "english", "uk", "prime", "minister", "british"]
     }
 }
