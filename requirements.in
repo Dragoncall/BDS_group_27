@@ -12,5 +12,6 @@ python-dotenv
 markdown
 matplotlib
 flask-cors
-
 uwsgi
+emoji
+git+https://github.com/erikavaris/tokenizer.git
