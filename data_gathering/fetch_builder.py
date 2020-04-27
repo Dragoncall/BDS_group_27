@@ -59,7 +59,11 @@ class FetchBuilder:
 
     def compile_query_params(self):
         query_dict = self.__dict__
-        query_dict.pop('count', None)
+        count = query_dict.pop('count', None)
+        query_dict['count'] = min(count, 100) if count else count
+        result_type:'ResultType' = query_dict.pop('result_type', None)
+        if result_type is not None:
+            query_dict['result_type'] = result_type.value
 
         if query_dict['filter_retweets'] == 'True':
              query_dict['q'] += '-filter:retweets'
