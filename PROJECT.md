@@ -11,6 +11,23 @@ This project can thus be seen as an augmentation of the twitter API with sentime
 ## Usage examples
 TODO
 
+### Current endpoints
+
+- /raw-data: Returns the raw data as retrieved from the Twitter API
+- /sentiment-data: Returns the sentiment data over the retrieved Tweets
+- /sentiment-distribution: Returns the distribution of the sentiments of all tweets 
+- /most-prevalent-sentiment: Returns the most prevalent sentiment
+
+### Current query parameters
+
+- query: Search query for the tweets
+- lang:  Language of the tweets
+- count: Amount of tweets retrieved
+- until: Tweets until date
+- since_id: Only tweets after a given tweet
+- max_id: Only tweets before a given tweet
+- filter_retweets: Filter retweets
+
 ## Optimised handles
 Some prominent figures were focused on by our team for analysis. These people contain extra tags and keywords used
 a lot to depict them or reference them. We accept augmentations to these people. This can be done by adding or changing

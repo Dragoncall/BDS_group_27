@@ -52,6 +52,7 @@ tensorflow==2.1.0         # via -r ./requirements.in
 termcolor==1.1.0          # via tensorflow
 tweepy==3.8.0             # via -r ./requirements.in
 urllib3==1.25.8           # via requests
+uwsgi==2.0.18             # via -r ./requirements.in
 werkzeug==1.0.1           # via -r ./requirements.in, flask, tensorboard
 wheel==0.34.2             # via tensorboard, tensorflow
 wrapt==1.12.1             # via tensorflow

@@ -43,13 +43,14 @@
         valueType: 'Category',
         title: 'Sentiment'
       },
-      loading: false
+      loading: false,
+      url: 'http://193.191.169.46' // TODO: this is so ugly bruh
     }),
     methods: {
       async fetchData() {
         this.loading = true;
         const nonTransformedData = await axios.get(
-                `http://127.0.0.1:5000/sentiment-distribution?query=${this.query}&count=${this.count}&until=${this.until}${this.since_id ? '&since_id=' + this.since_id : ''}${this.max_id ? '&max_id=' + this.max_id : ''}`
+                `${this.url}/sentiment-distribution?query=${this.query}&count=${this.count}&until=${this.until}${this.since_id ? '&since_id=' + this.since_id : ''}${this.max_id ? '&max_id=' + this.max_id : ''}`
         );
         const values = nonTransformedData.data.sentiment_distribution;
         const data = [];
