@@ -60,7 +60,7 @@ def get_all_handles():
 
 if __name__ == '__main__':
     for handle in get_all_handles():
-        df = read_time_data_for_person(handle, RECENT)
+        df = read_time_data_for_person(handle, POPULAR)
         plot_time_data(df, title=handle)
 
 

@@ -9,6 +9,7 @@ from processing.output.file_output_pipeline import FileOutputPipeline
 from processing.pipeline_zoo import _targeted_sentiment_analysis_pipeline, only_class, only_readable_class, \
     get_data_pipeline, _tweet_length_pipeline
 from processing.post_processing.SentimentDistributionPipeline import SentimentDistributionPipeline
+from processing.utils.flatten_pipeline import FlattenPipeline
 from processing.utils.map_pipeline import MapPipeline
 import datetime
 
@@ -39,17 +40,27 @@ def _get_tweet_length(filename: str):
 
     return pipeline
 
+def _get_raw_tweets(filename: str):
+    pipeline = FlattenPipeline('flatten_data')
 
-def get_pipeline(filename_sentiment: str, filename_length: str, result_type: ResultType = None):
+    pipeline.link(MapPipeline('status_to_text', lambda x: x._json))\
+        .link(ToJsonPipeline('to_json')) \
+        .link(FileOutputPipeline(filename)) \
+        .link(OutputPipelineStep('output_tweet_lengths', lambda x: x))
+
+    return pipeline
+
+
+def get_pipeline(filename_sentiment: str, filename_length: str, filename_raw: str, result_type: ResultType = None):
     input_step, data_step = get_data_pipeline(
         with_handle=True, with_tags=True, with_keywords=True,
-        # with_handle=True, with_tags=False, with_keywords=False,
         result_type=result_type
     )
 
     data_step.link(SplitPipelineStep(outputs=[
         _get_sentiment_for_person_pipeline(filename_sentiment),
-        _get_tweet_length(filename_length)
+        _get_tweet_length(filename_length),
+        _get_raw_tweets(filename_raw)
     ]))
 
     return input_step
@@ -82,11 +93,13 @@ if __name__ == '__main__':
                 get_pipeline(
                     f'./data_trove/{person}_{str(datetime.datetime.now())}_recent.json',
                     f'./data_trove/tweetlength/{person}_{str(datetime.datetime.now())}_recent.json',
+                    f'./data_trove/raw/{person}_{str(datetime.datetime.now())}_recent.json',
                     result_type=ResultType.RECENT
                 ).feed_data(person)
                 get_pipeline(
                     f'./data_trove/{person}_{str(datetime.datetime.now())}_popular.json',
-                    f'./data_trove/tweetlength/{person}_{str(datetime.datetime.now())}_recent.json',
+                    f'./data_trove/tweetlength/{person}_{str(datetime.datetime.now())}_popular.json',
+                    f'./data_trove/raw/{person}_{str(datetime.datetime.now())}_popular.json',
                     result_type=ResultType.POPULAR
                 ).feed_data(person)
                 error = False
