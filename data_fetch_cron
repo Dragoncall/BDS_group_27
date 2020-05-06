@@ -1,4 +1,4 @@
-0 6 * * * python /app/data_collection_cron.py >> /var/log/cron.log 2>&1
-0 12 * * * python /app/data_collection_cron.py >> /var/log/cron.log 2>&1
-0 18 * * * python /app/data_collection_cron.py >> /var/log/cron.log 2>&1
-0 24 * * * python /app/data_collection_cron.py >> /var/log/cron.log 2>&1
+0 0 * * * cd /app && python ./data_collection_cron.py >> /var/log/cron.log 2>&1
+0 6 * * * cd /app && python ./data_collection_cron.py >> /var/log/cron.log 2>&1
+0 12 * * * cd /app && python ./data_collection_cron.py >> /var/log/cron.log 2>&1
+0 18 * * * cd /app && python ./data_collection_cron.py >> /var/log/cron.log 2>&1
