@@ -1,29 +1,77 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dark>
+      <v-app-bar-nav-icon @click="drawer = true"></v-app-bar-nav-icon>
       <h3>BDS Group 27</h3>
     </v-app-bar>
+
+    <v-navigation-drawer v-model="drawer" absolute temporary>
+      <v-list nav dense>
+        <v-list-item-group
+          v-model="group"
+          active-class="primary--text text--accent-4"
+        >
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-emoticon</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              <h3 @click="goToSentimentAnalysis()">Sentiment Distribution</h3>
+            </v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-cloud</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              <h3 @click="goToWordCloud()">Wordcloud</h3>
+            </v-list-item-title>
+          </v-list-item>
+
+          <v-list-item>
+            <v-list-item-icon>
+              <v-icon>mdi-poll</v-icon>
+            </v-list-item-icon>
+            <v-list-item-title>
+              <h3 @click="goToWordDistribution()">Word Distribution</h3>
+            </v-list-item-title>
+          </v-list-item>
+
+        </v-list-item-group>
+      </v-list>
+    </v-navigation-drawer>
+
     <v-content>
-      <VisualiserWordCloud/>
+      <router-view />
     </v-content>
+    
   </v-app>
 </template>
 
 <script>
 
-// import VisualiserSentimentDistribution from "./components/VisualiserSentimentDistribution";
-// import VisualiserWordDistribution from "./components/VisualiserWordDistribution";
-import VisualiserWordCloud from "./components/VisualiserWordCloud";
-
 export default {
   name: 'App',
 
   components: {
-    VisualiserWordCloud
+    //
+  },
+
+  methods: {
+    goToSentimentAnalysis(){
+      this.$router.push({name:'sentiment'})
+    },
+    goToWordCloud(){
+      this.$router.push({name:'wordcloud'})
+    },
+    goToWordDistribution(){
+      this.$router.push({name:'word-distribution'})
+    }
   },
 
   data: () => ({
-    //
+    drawer: false,
   }),
 };
 </script>
