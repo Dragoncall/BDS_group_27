@@ -10,7 +10,10 @@ docker build --tag karelvb/bigdgroup27 .
 docker push karelvb/bigdgroup27
 
 # Backend on virtual wall
-ssh groep36@193.191.169.46 "sudo mkdir ~/data_trove
+ssh groep36@193.191.169.46 "
+sudo mkdir ~/data_trove
+sudo mkdir ~/data_trove/raw
+sudo mkdir ~/data_trove/tweetlength
 sudo docker pull karelvb/bigdgroup27
 sudo docker stop backend
 sudo docker rm backend
