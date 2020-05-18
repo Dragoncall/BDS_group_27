@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  import { StackingAreaSeries, Category, Legend } from "@syncfusion/ej2-vue-charts";
+  import { StackingAreaSeries, Category, Legend, DateTime } from "@syncfusion/ej2-vue-charts";
   const axios = require('axios').default;
 
   export default {
@@ -76,7 +76,7 @@
       }
     },
     provide: {
-      chart: [StackingAreaSeries, Category, Legend]
+      chart: [StackingAreaSeries, Category, Legend, DateTime]
     }
   }
 </script>
