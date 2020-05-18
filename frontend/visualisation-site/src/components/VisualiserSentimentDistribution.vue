@@ -46,7 +46,7 @@
         title: 'Sentiment'
       },
       loading: false,
-      url: 'http://127.0.0.1:5000/' // TODO: this is so ugly bruh
+      url: 'http://127.0.0.1:5000/' // TODO: change this to env variable for production (out of scope)
     }),
     methods: {
       async fetchData() {

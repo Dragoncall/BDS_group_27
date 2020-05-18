@@ -17,9 +17,9 @@
         </v-radio-group>
         <v-btn :loading="loading" @click="fetchData()">Fetch</v-btn>
 
-        <ejs-chart id="container" 
-            title='Sentiment Distribution' 
-            v-if="data" 
+        <ejs-chart id="container"
+            title='Sentiment Distribution'
+            v-if="data"
             :primaryXAxis='primaryXAxis'
             :legendSettings='legendSettings'
         >
@@ -48,7 +48,7 @@
       result_type: null,
       items: ['POTUS', 'BorisJohnson', 'JustinTrudeau', 'Sophie_Wilmes', 'elonmusk', 'BillGates'],
       primaryXAxis: {
-        valueType: 'Category',
+        valueType: 'DateTime',
         title: 'Date',
         labelRotation : -45
       },
@@ -68,7 +68,7 @@
         const values = nonTransformedData.data.sentiment_distribution;
         const data = [];
         for (const key of Object.keys(values)) {
-            data.push({x: key, y: values[key]['Positive'], y1: values[key]['Neutral'], y2: values[key]['Negative']})
+            data.push({x: new Date(key), y: values[key]['Positive'], y1: values[key]['Neutral'], y2: values[key]['Negative']})
         }
         console.log(data);
         this.data = data;

@@ -47,7 +47,10 @@ and other processing steps will be defined here.
 The current API uses Pipelines. Pipelines can be linked to eachother as to create one uniform flow
 of data. These pipelines are then collected in the pipeline zoo where developers can either create new pipelines
 or consume the most general pipelines. This will make it easy to return different kinds of data rapidly by
-containing the functionality of one step to as little as possible. 
+containing the functionality of one step to as little as possible. Another **great advantage is the possibility of, like spark,
+distributing the load over multiple microservices**. Due to the scope of the project, this was not implemented,
+but applications can easily be connected with RPCPipelines for example, pushing the data to other microservices
+that run on, for example, a kubernetes cluster. This is the main advantage of using these pipelines.
 
 Some pipelines support checkpointing by setting the `checkpointed` flag to true during initialisation.
 What this does is caching all runs' results based on the input hash. 
@@ -84,3 +87,6 @@ The preferred way to create such a visualisation is to go through 3 steps.
 To allow visualisations to be a `PipelineStep`, the `Visualiser` class has
 all methods a visualisation needs to extend. This will also allow a `Visualiser` to
 be ran during other pipelines (for example to visualise API usage or API latency?)
+
+Offline visualisations are visualisation for which we do not need a pipeline step. These visualisations are mostly
+over either a lot of data, or data comes from multiple non-streaming sources. 

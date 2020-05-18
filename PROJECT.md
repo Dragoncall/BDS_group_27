@@ -8,9 +8,6 @@ relevancy_type, geocode, ...
 The twitter API is mirrored as closely as possible to allow easy entry for people with previous experience.
 This project can thus be seen as an augmentation of the twitter API with sentiment analysis.
 
-## Usage examples
-TODO
-
 ### Current endpoints
 
 - /raw-data: Returns the raw data as retrieved from the Twitter API
@@ -35,4 +32,10 @@ keywords in the `prominent_people.json` file on our github.
 
 Optimised prominent people include:
 
-- None currently (TODO: add these and include a link to their endpoint (which will be their handle most likely))
+- POTUS (currently Donald Trump)
+- Elon Musk
+- Bill Gates
+- Boris Johnson
+- ...
+
+More can be found or added in the `resources/prominent_people.json` file.

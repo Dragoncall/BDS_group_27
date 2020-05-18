@@ -16,3 +16,4 @@ uwsgi
 emoji
 git+https://github.com/erikavaris/tokenizer.git
 pandas
+sklearn
