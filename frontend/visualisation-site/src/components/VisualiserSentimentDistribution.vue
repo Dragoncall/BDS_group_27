@@ -46,7 +46,7 @@
         title: 'Sentiment'
       },
       loading: false,
-      url: 'http://193.191.169.46' // TODO: this is so ugly bruh
+      url: 'http://127.0.0.1:5000/' // TODO: this is so ugly bruh
     }),
     methods: {
       async fetchData() {

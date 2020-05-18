@@ -15,6 +15,7 @@ from data_gathering.sample_data_gathering import get_sample_data_gathering
 from processing import pipeline_zoo
 from settings import get_tweepy_client
 
+from visualisation.offline_visualisations.timeplot_graph import read_time_data_for_person
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -139,6 +140,29 @@ def get_most_prevalent_sentiment():
         result = x
 
     pipeline_zoo.get_sentiment_analysis_most_prevalent_pipeline(set_result).feed_data((params, None))
+    return jsonify({
+        'sentiment_distribution': result
+    })
+
+@app.route('/sentiment-history')
+@cross_origin()
+def get_sentiment_history():
+    """
+    Does sentiment analysis on the stored tweets of a promiment figure
+    Returns the history of sentiment distribution to the user
+    Example request: /sentiment-history?figure=kek&result_type=recent
+    """
+    params = request.args
+    result = {}
+
+    handle = params['figure']
+    result_type = params['result_type']
+
+    df = read_time_data_for_person(handle, result_type)
+
+    for index, row in df.iterrows():
+        result[index] = dict(row)
+
     return jsonify({
         'sentiment_distribution': result
     })
