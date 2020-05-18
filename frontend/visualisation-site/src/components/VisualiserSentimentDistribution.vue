@@ -7,7 +7,7 @@
         <v-text-field label="Until" v-model="until"></v-text-field>
         <v-text-field type="number" label="Since ID" v-model="since_id"></v-text-field>
         <v-text-field type="number" label="Max ID" v-model="max_id"></v-text-field>
-        <v-slider style="margin-top: 32px;" v-model="count" min="5" max="100" label="Count" thumb-label="always"></v-slider>
+        <v-slider style="margin-top: 32px;" v-model="count" min="5" max="500" label="Count" thumb-label="always"></v-slider>
         <v-switch label="Filter retweets" v-model="filter_rt" value="True"></v-switch>
         <v-btn :loading="loading" @click="fetchData()">Fetch</v-btn>
         <ejs-chart id="container" title='sentiment distribution' v-if="data" :primaryXAxis='primaryXAxis'>
@@ -46,7 +46,7 @@
         title: 'Sentiment'
       },
       loading: false,
-      url: 'http://193.191.169.46' // TODO: this is so ugly bruh
+      url: 'http://127.0.0.1:5000/' // TODO: this is so ugly bruh
     }),
     methods: {
       async fetchData() {
