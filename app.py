@@ -15,7 +15,7 @@ from data_gathering.sample_data_gathering import get_sample_data_gathering
 from processing import pipeline_zoo
 from settings import get_tweepy_client
 
-from visualisation.offline_visualisations.timeplot_graph import read_time_data_for_person
+from visualisation.offline_visualisations.timeplot_graph import read_time_data_for_person, get_all_handles
 
 app = Flask(__name__)
 cors = CORS(app)
@@ -165,6 +165,23 @@ def get_sentiment_history():
 
     return jsonify({
         'sentiment_distribution': result
+    })
+
+@app.route('/prominent-figures')
+@cross_origin()
+def get_prominent_figures():
+    """
+    Returns the list of prominent figures
+    Example request: /sentiment-history?figure=kek&result_type=recent
+    """
+    result = []
+    handles = get_all_handles()
+
+    for handle in handles:
+        result.append(handle)
+
+    return jsonify({
+        'handles': result
     })
 
 @app.route('/')

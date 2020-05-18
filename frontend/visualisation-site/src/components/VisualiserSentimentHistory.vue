@@ -36,7 +36,7 @@
 </template>
 
 <script>
-  import { StackingAreaSeries, Category, Legend, DateTime } from "@syncfusion/ej2-vue-charts";
+  import { StackingAreaSeries, Legend, DateTime } from "@syncfusion/ej2-vue-charts";
   const axios = require('axios').default;
 
   export default {
@@ -46,7 +46,7 @@
       data: undefined,
       figure: '',
       result_type: null,
-      items: ['POTUS', 'BorisJohnson', 'JustinTrudeau', 'Sophie_Wilmes', 'elonmusk', 'BillGates'],
+      items: [],
       primaryXAxis: {
         valueType: 'DateTime',
         title: 'Date',
@@ -55,7 +55,7 @@
       legendSettings: {
           visible: true,
           position: 'Top'
-        },
+      },
       loading: false,
       url: 'http://127.0.0.1:5000/' // TODO: this is so ugly bruh
     }),
@@ -73,10 +73,20 @@
         console.log(data);
         this.data = data;
         this.loading = false;
-      }
+      },
+      getProminentFigures(){
+        const path = `${this.url}/prominent-figures`;
+        axios.get(path)
+          .then((res) => {
+            this.items = res.data.handles;
+          });
+      },
     },
     provide: {
-      chart: [StackingAreaSeries, Category, Legend, DateTime]
+      chart: [StackingAreaSeries, DateTime, Legend]
+    },
+    created(){
+      this.getProminentFigures();
     }
   }
 </script>
