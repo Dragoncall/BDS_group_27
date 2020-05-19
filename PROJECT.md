@@ -62,3 +62,10 @@ Optimised prominent people include:
 - Emmanuel Macron (FR)
 
 More can be found or added in the `resources/prominent_people.json` file.
+
+# Frontend
+The frontend can be found under the `frontend` folder. 
+There, a small frontend app exists to show the different data in an easy to consume format. This will
+make it easier for non-technical users to consume the data and draw conclusions from them. 
+To run this, one should run `npm install` and `npm run serve`. The backend should be serving to handle requests
+and for the frontend to receive data. 
