@@ -79,6 +79,8 @@ this represents the input data (all kinds of input) in a binary way.
 In the resource folder, all static resources are summed up. This folder was added to include the prominent people
 in an easy to change format (such as JSON). This will allow other people to more easily add their tags and keywords.
 
+In this folder can also be found the sentiment analysis training notebook. There, preprocessing and training steps are described thoroughly. The final tokenizer and model were fit on a labeled dataset and saved so as to be used for prediction in the sentiment analysis pipeline.
+
 ## Visualisations
 This API is part of an analysis. All visualisation code is present under the `visualisation` directory and will
 probably include `matplotlib` plots, `D3` visualisations and other derivatives of this API.
