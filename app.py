@@ -69,7 +69,7 @@ def get_sentiment_distribution():
     """
     Fetches the twitter data based on the query params alone.
     Does sentiment analysis on the tweets and returns the sentiment distribution to the user
-    Example request: /sentiment-data?query=kek&count=1
+    Example request: /sentiment-distribution?query=kek&count=1
     """
     params = request.args
     result = None
@@ -169,6 +169,7 @@ def get_sentiment_history():
 
 @app.route('/')
 def index():
+    """Returns the Project.md file in a readable format to allow users to check our 'documentation' """
     with open("PROJECT.md", "r") as project_file:
         md_template_string = markdown.markdown(
             project_file.read(), extensions=["fenced_code"]

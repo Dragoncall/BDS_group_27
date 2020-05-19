@@ -44,7 +44,7 @@ that we can reason about them more easily in our code.
 This directory will include the processing steps we do within our API. Sentiment analysis, aggregation 
 and other processing steps will be defined here.
 
-The current API uses Pipelines. Pipelines can be linked to eachother as to create one uniform flow
+The current API uses Pipelines. Pipelines can be linked to each other as to create one uniform flow
 of data. These pipelines are then collected in the pipeline zoo where developers can either create new pipelines
 or consume the most general pipelines. This will make it easy to return different kinds of data rapidly by
 containing the functionality of one step to as little as possible. Another **great advantage is the possibility of, like spark,
@@ -89,4 +89,13 @@ all methods a visualisation needs to extend. This will also allow a `Visualiser`
 be ran during other pipelines (for example to visualise API usage or API latency?)
 
 Offline visualisations are visualisation for which we do not need a pipeline step. These visualisations are mostly
-over either a lot of data, or data comes from multiple non-streaming sources. 
+over either a lot of data such that we cannot compute them in real time,
+or data comes from multiple non-streaming sources, for example a running cron job.
+
+## Data trove
+We included a data trove that contains all our ran cron tasks. A normal project would not add these to the git
+repository, but as this is a school project, we wanted to add all necessary resources.
+
+The data trove contains the sentiment distribution for each handle over a couple of datetimes.
+The `raw` folder contains the raw tweet data. The `tweetlength` folder contains the tweet length per tweet.
+These can be extended by adding extra output pipelines, but we leave this up to the business needs of each user.
