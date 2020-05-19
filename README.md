@@ -4,6 +4,10 @@
 First run `pip install -r ./requirements.txt`\
 Next go to the `app.py` and run the python file to start a test server.
 
+For the demo application run the shell script `run-demo.sh`. This will set up all the requirements of
+python and node. Then it will run a server in the background and serve the frontend in development mode.
+This should make it easy to test the application.
+
 
 ## General Structure
 This project is a flask web application with multiple endpoints.
