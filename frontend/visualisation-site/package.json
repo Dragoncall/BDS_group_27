@@ -11,7 +11,7 @@
     "@mdi/font": "^3.6.95",
     "@syncfusion/ej2-vue-charts": "^18.1.43",
     "@syncfusion/ej2-vue-grids": "^18.1.43",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "core-js": "^3.6.4",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
